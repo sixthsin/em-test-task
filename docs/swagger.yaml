@@ -1,0 +1,298 @@
+definitions:
+  em-task_internal_repository.CreatePersonDTO:
+    properties:
+      name:
+        description: Имя
+        example: John
+        type: string
+      patronymic:
+        description: Отчество
+        example: William
+        type: string
+      surname:
+        description: Фамилия
+        example: Smith
+        type: string
+    required:
+    - name
+    - surname
+    type: object
+  em-task_internal_repository.FullPersonDTO:
+    properties:
+      age:
+        description: Возраст
+        example: 30
+        minimum: 0
+        type: integer
+      gender:
+        description: Пол
+        example: male
+        type: string
+      id:
+        description: ID
+        example: 1
+        type: integer
+      name:
+        description: Имя
+        example: John
+        type: string
+      nationality:
+        description: Национальность
+        example: US
+        type: string
+      patronymic:
+        description: Отчество
+        example: William
+        type: string
+      surname:
+        description: Фамилия
+        example: Smith
+        type: string
+    required:
+    - name
+    - surname
+    type: object
+  internal_handlers.BadRequestResponse:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: Invalid ID format
+        type: string
+      status:
+        example: error
+        type: string
+    type: object
+  internal_handlers.InternalServerErrorResponse:
+    properties:
+      code:
+        example: 500
+        type: integer
+      message:
+        example: Some error message
+        type: string
+      status:
+        example: error
+        type: string
+    type: object
+  internal_handlers.PersonResponse:
+    properties:
+      Age:
+        example: 49
+        type: integer
+      CreatedAt:
+        example: "2025-05-01T03:35:20.374096098+03:00"
+        type: string
+      DeletedAt:
+        example: ""
+        type: string
+      Gender:
+        example: female
+        type: string
+      ID:
+        example: 42
+        type: integer
+      Name:
+        example: John
+        type: string
+      Nationality:
+        example: SK
+        type: string
+      Patronymic:
+        example: ""
+        type: string
+      Surname:
+        example: Smith
+        type: string
+      UpdatedAt:
+        example: "2025-05-01T03:35:20.374096098+03:00"
+        type: string
+    type: object
+  internal_handlers.SuccessfullyDeletedResponse:
+    properties:
+      code:
+        example: 200
+        type: integer
+      message:
+        example: Person successfully deleted
+        type: string
+      status:
+        example: ok
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/create:
+    post:
+      consumes:
+      - application/json
+      description: Создание новой персоны с обогащением данных
+      parameters:
+      - description: Данные для создания персоны
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/em-task_internal_repository.CreatePersonDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное создание
+          schema:
+            $ref: '#/definitions/internal_handlers.PersonResponse'
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/internal_handlers.BadRequestResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/internal_handlers.InternalServerErrorResponse'
+      summary: Создать персону
+      tags:
+      - people
+  /api/v1/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Удаление персоны по ID
+      parameters:
+      - description: ID персоны
+        example: 1
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное удаление
+          schema:
+            $ref: '#/definitions/internal_handlers.SuccessfullyDeletedResponse'
+        "400":
+          description: Неверный ID
+          schema:
+            $ref: '#/definitions/internal_handlers.BadRequestResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/internal_handlers.InternalServerErrorResponse'
+      summary: Удалить персону
+      tags:
+      - people
+  /api/v1/edit/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Редактирование данных персоны по ID
+      parameters:
+      - description: ID персоны
+        example: 1
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/em-task_internal_repository.FullPersonDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Обновленная персона
+          schema:
+            $ref: '#/definitions/internal_handlers.PersonResponse'
+        "400":
+          description: Ошибка валидации
+          schema:
+            $ref: '#/definitions/internal_handlers.BadRequestResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/internal_handlers.InternalServerErrorResponse'
+      summary: Редактировать персону
+      tags:
+      - people
+  /api/v1/get:
+    get:
+      consumes:
+      - application/json
+      description: Получение списка персон с использованием параметров фильтрации,
+        лимита и смещения
+      parameters:
+      - description: Лимит
+        example: 10
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение
+        example: 0
+        in: query
+        name: offset
+        type: integer
+      - description: Возраст
+        example: 30
+        in: query
+        name: age
+        type: integer
+      - description: Возраст от
+        example: 18
+        in: query
+        name: age_from
+        type: integer
+      - description: Возраст до
+        example: 40
+        in: query
+        name: age_to
+        type: integer
+      - description: Пол
+        example: male
+        in: query
+        name: gender
+        type: string
+      - description: Имя
+        example: John
+        in: query
+        name: name
+        type: string
+      - description: Национальность
+        example: US
+        in: query
+        name: nationality
+        type: string
+      - description: Отчество
+        example: William
+        in: query
+        name: patronymic
+        type: string
+      - description: Фамилия
+        example: Smith
+        in: query
+        name: surname
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное получение
+          schema:
+            $ref: '#/definitions/internal_handlers.PersonResponse'
+        "400":
+          description: Неверные параметры запроса
+          schema:
+            $ref: '#/definitions/internal_handlers.BadRequestResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/internal_handlers.InternalServerErrorResponse'
+      summary: Получить список персон
+      tags:
+      - people
+swagger: "2.0"

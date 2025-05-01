@@ -1,0 +1,36 @@
+package cfg
+
+import (
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
+)
+
+type Config struct {
+	Db     DbConfig
+	Server ServerConfig
+}
+
+type DbConfig struct {
+	Dsn string
+}
+
+type ServerConfig struct {
+	Port string
+}
+
+func LoadConfig() *Config {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file, using default config")
+	}
+	return &Config{
+		Db: DbConfig{
+			Dsn: os.Getenv("DSN"),
+		},
+		Server: ServerConfig{
+			Port: os.Getenv("PORT"),
+		},
+	}
+}

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  enrichment_db:
+    image: postgres:17.4
+    container_name: enrichment_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: enrichment
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d enrichment"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  enrichment_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: enrichment_app
+    restart: unless-stopped
+    depends_on:
+      enrichment_db:
+        condition: service_healthy
+    environment:
+      DB_HOST: enrichment_db
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: enrichment
+      DSN: "host=enrichment_db user=user password=password dbname=enrichment port=5432 sslmode=disable"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
