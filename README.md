@@ -17,20 +17,17 @@
 
 Для сборки и запуска приложения с использованием Docker Compose выполните следующую команду:
 
-```bash
-docker-compose up --build
-```
-
-### Сборка и запуск локально без Docker Compose
-
-Создайте файл `.env` в корневом каталоге и настройте переменные окружения
-Например:
+Создайте файл `.env` в корневом каталоге и настройте переменные окружения:
 ```env
 PORT=":8080"
 DSN="host=localhost port=5432 dbname=mydatabase user=myuser password=mypassword"
 ```
 
-Соберите и запустите приложение 
+```bash
+docker-compose up --build
+```
+
+### Сборка и запуск локально без Docker Compose
 ```bash
 go build -o main cmd/main.go
 ./main
